@@ -229,7 +229,8 @@ public class SelectionTool extends AbstractTool {
 
     /**
      * Finds the target figure under the given drawing point.
-     * Applies select-behind logic when alt/ctrl modifiers are held.
+     * Routes to select-behind logic when alt/ctrl modifiers are held,
+     * otherwise finds the topmost selectable figure at the point.
      *
      * @param view the current drawing view
      * @param drawingPoint the point in drawing coordinates
@@ -237,45 +238,71 @@ public class SelectionTool extends AbstractTool {
      * @return the target figure, or null if none found
      */
     private Figure findTargetFigure(DrawingView view, Point2D.Double drawingPoint, MouseEvent evt) {
-        Drawing drawing = view.getDrawing();
-        Figure figure;
-        if (isSelectBehindEnabled()
+        return isSelectBehindModifierHeld(evt)
+                ? findFigureBehindCurrentSelection(view, drawingPoint)
+                : findFigureAtPoint(view, drawingPoint);
+    }
+
+    /**
+     * Returns true when the user is holding the alt or ctrl modifier,
+     * indicating a select-behind gesture.
+     *
+     * @param evt the mouse event
+     * @return true if select-behind modifier is held
+     */
+    private boolean isSelectBehindModifierHeld(MouseEvent evt) {
+        return isSelectBehindEnabled()
                 && (evt.getModifiersEx()
-                & (InputEvent.ALT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK)) != 0) {
-            // Select a figure behind the current selection
-            figure = view.findFigure(anchor);
-            while (figure != null && !figure.isSelectable()) {
-                figure = drawing.findFigureBehind(drawingPoint, figure);
-            }
-            HashSet<Figure> ignoredFigures = new HashSet<>(view.getSelectedFigures());
-            ignoredFigures.add(figure);
-            Figure figureBehind = drawing.findFigureBehind(
-                    drawingPoint, ignoredFigures);
-            if (figureBehind != null) {
-                figure = figureBehind;
-            }
-        } else {
-            // Note: The search sequence used here, must be
-            // consistent with the search sequence used by the
-            // DefaultHandleTracker, the DefaultSelectAreaTracker and DelegationSelectionTool.
-            // If possible, continue to work with the current selection
-            figure = null;
-            if (isSelectBehindEnabled()) {
-                for (Figure f : view.getSelectedFigures()) {
-                    if (f.contains(drawingPoint)) {
-                        figure = f;
-                        break;
-                    }
+                & (InputEvent.ALT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK)) != 0;
+    }
+
+    /**
+     * Finds the first selectable figure behind the current selection at the given point.
+     * Used when the user holds alt/ctrl to reach figures underneath the current selection.
+     *
+     * @param view the current drawing view
+     * @param drawingPoint the point in drawing coordinates
+     * @return the figure behind the current selection, or null if none found
+     */
+    private Figure findFigureBehindCurrentSelection(DrawingView view, Point2D.Double drawingPoint) {
+        Drawing drawing = view.getDrawing();
+        Figure figure = view.findFigure(anchor);
+        while (figure != null && !figure.isSelectable()) {
+            figure = drawing.findFigureBehind(drawingPoint, figure);
+        }
+        HashSet<Figure> ignoredFigures = new HashSet<>(view.getSelectedFigures());
+        ignoredFigures.add(figure);
+        Figure figureBehind = drawing.findFigureBehind(drawingPoint, ignoredFigures);
+        if (figureBehind != null) {
+            figure = figureBehind;
+        }
+        return figure;
+    }
+
+    /**
+     * Finds the topmost selectable figure at the given point.
+     * Prefers a figure already in the current selection; falls back to a drawing search.
+     * <p>
+     * Note: The search sequence used here must be consistent with the sequence used by
+     * {@link DefaultHandleTracker}, {@link DefaultSelectAreaTracker}, and
+     * {@link DelegationSelectionTool}.
+     *
+     * @param view the current drawing view
+     * @param drawingPoint the point in drawing coordinates
+     * @return the figure at the point, or null if none found
+     */
+    private Figure findFigureAtPoint(DrawingView view, Point2D.Double drawingPoint) {
+        Drawing drawing = view.getDrawing();
+        if (isSelectBehindEnabled()) {
+            for (Figure f : view.getSelectedFigures()) {
+                if (f.contains(drawingPoint)) {
+                    return f;
                 }
             }
-            // If the point is not contained in the current selection,
-            // search for a figure in the drawing.
-            if (figure == null) {
-                figure = view.findFigure(anchor);
-                while (figure != null && !figure.isSelectable()) {
-                    figure = drawing.findFigureBehind(drawingPoint, figure);
-                }
-            }
+        }
+        Figure figure = view.findFigure(anchor);
+        while (figure != null && !figure.isSelectable()) {
+            figure = drawing.findFigureBehind(drawingPoint, figure);
         }
         return figure;
     }
