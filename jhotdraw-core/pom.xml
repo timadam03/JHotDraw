@@ -47,6 +47,14 @@
 			<version>4.13.2</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- Mockito lets the action-level tests stand in a fake DrawingView so the
+		     enabled-state rules can be checked without a live Swing editor. -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>4.11.0</version>
+			<scope>test</scope>
+		</dependency>
 		<!-- JGiven turns the user story into runnable Given-When-Then scenarios on
 		     top of JUnit, and AssertJ gives the readable assertions the Then steps
 		     use. Both are test scoped, so they never reach the shipped jar. -->
