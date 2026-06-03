@@ -50,21 +50,20 @@ public class SelectionColorChooserHandler extends AbstractSelectedAction
 
     protected void applySelectedColorToFigures() {
         final ArrayList<Figure> selectedFigures = new ArrayList<>(getView().getSelectedFigures());
-        final Color selectedColor = resolveSelectedColor();
+        final Color selectedColor = normalizeChosenColor(colorChooser.getColor());
         final ArrayList<Object> restoreData = applyColorToFigures(selectedColor, selectedFigures);
         getEditor().setDefaultAttribute(key, selectedColor);
         fireUndoableEditHappened(createUndoableEdit(selectedColor, selectedFigures, restoreData));
     }
 
-    private Color resolveSelectedColor() {
-        Color color = colorChooser.getColor();
+    static Color normalizeChosenColor(Color color) {
         if (color != null && color.getAlpha() == 0) {
             return null;
         }
         return color;
     }
 
-    private ArrayList<Object> applyColorToFigures(Color color, ArrayList<Figure> figures) {
+    ArrayList<Object> applyColorToFigures(Color color, ArrayList<Figure> figures) {
         ArrayList<Object> restoreData = new ArrayList<>(figures.size());
         for (Figure figure : figures) {
             restoreData.add(figure.getAttributesRestoreData());
@@ -75,7 +74,7 @@ public class SelectionColorChooserHandler extends AbstractSelectedAction
         return restoreData;
     }
 
-    private UndoableEdit createUndoableEdit(final Color undoValue, final ArrayList<Figure> figures, final ArrayList<Object> restoreData) {
+    UndoableEdit createUndoableEdit(final Color undoValue, final ArrayList<Figure> figures, final ArrayList<Object> restoreData) {
         return new AbstractUndoableEdit() {
             private static final long serialVersionUID = 1L;
 
