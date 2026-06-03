@@ -77,75 +77,69 @@ public class GroupAction extends AbstractSelectedAction {
     @Override
     public void actionPerformed(java.awt.event.ActionEvent e) {
         if (isGroupingAction) {
-            if (canGroup()) {
-                final DrawingView view = getView();
-                final LinkedList<Figure> ungroupedFigures = new LinkedList<>(view.getSelectedFigures());
-                final CompositeFigure group = (CompositeFigure) prototype.clone();
-                UndoableEdit edit = new AbstractUndoableEdit() {
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    public String getPresentationName() {
-                        ResourceBundleUtil labels
-                                = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
-                        return labels.getString("edit.groupSelection.text");
-                    }
-
-                    @Override
-                    public void redo() throws CannotRedoException {
-                        super.redo();
-                        groupFigures(view, group, ungroupedFigures);
-                    }
-
-                    @Override
-                    public void undo() throws CannotUndoException {
-                        ungroupFigures(view, group);
-                        super.undo();
-                    }
-
-                    @Override
-                    public boolean addEdit(UndoableEdit anEdit) {
-                        return super.addEdit(anEdit);
-                    }
-                };
-                groupFigures(view, group, ungroupedFigures);
-                fireUndoableEditHappened(edit);
-            }
+            groupSelection();
         } else {
-            if (canUngroup()) {
-                final DrawingView view = getView();
-                final CompositeFigure group = (CompositeFigure) getView().getSelectedFigures().iterator().next();
-                final LinkedList<Figure> ungroupedFigures = new LinkedList<>();
-                UndoableEdit edit = new AbstractUndoableEdit() {
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    public String getPresentationName() {
-                        ResourceBundleUtil labels
-                                = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
-                        return labels.getString("edit.ungroupSelection.text");
-                    }
-
-                    @Override
-                    public void redo() throws CannotRedoException {
-                        super.redo();
-                        ungroupFigures(view, group);
-                    }
-
-                    @Override
-                    public void undo() throws CannotUndoException {
-                        groupFigures(view, group, ungroupedFigures);
-                        super.undo();
-                    }
-                };
-                ungroupedFigures.addAll(ungroupFigures(view, group));
-                fireUndoableEditHappened(edit);
-            }
+            ungroupSelection();
         }
     }
 
+    private void groupSelection() {
+        if (!canGroup()) {
+            return;
+        }
+        final DrawingView view = getView();
+        final LinkedList<Figure> ungroupedFigures = new LinkedList<>(view.getSelectedFigures());
+        final CompositeFigure group = (CompositeFigure) prototype.clone();
+        groupFigures(view, group, ungroupedFigures);
+        fireUndoableEditHappened(createGroupEdit(view, group, ungroupedFigures));
+    }
+
+    private void ungroupSelection() {
+        if (!canUngroup()) {
+            return;
+        }
+        final DrawingView view = getView();
+        final CompositeFigure group = (CompositeFigure) view.getSelectedFigures().iterator().next();
+        final LinkedList<Figure> ungroupedFigures = new LinkedList<>(ungroupFigures(view, group));
+        fireUndoableEditHappened(createUngroupEdit(view, group, ungroupedFigures));
+    }
+
+    private UndoableEdit createGroupEdit(DrawingView view, CompositeFigure group, Collection<Figure> figures) {
+        return createUndoableEdit("edit.groupSelection.text",
+                () -> groupFigures(view, group, figures),
+                () -> ungroupFigures(view, group));
+    }
+
+    private UndoableEdit createUngroupEdit(DrawingView view, CompositeFigure group, Collection<Figure> figures) {
+        return createUndoableEdit("edit.ungroupSelection.text",
+                () -> ungroupFigures(view, group),
+                () -> groupFigures(view, group, figures));
+    }
+
+    private UndoableEdit createUndoableEdit(String presentationId, Runnable redoOperation, Runnable undoOperation) {
+        return new AbstractUndoableEdit() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public String getPresentationName() {
+                return ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels").getString(presentationId);
+            }
+
+            @Override
+            public void redo() throws CannotRedoException {
+                super.redo();
+                redoOperation.run();
+            }
+
+            @Override
+            public void undo() throws CannotUndoException {
+                undoOperation.run();
+                super.undo();
+            }
+        };
+    }
+
     public Collection<Figure> ungroupFigures(DrawingView view, CompositeFigure group) {
-// XXX - This code is redundant with UngroupAction
         LinkedList<Figure> figures = new LinkedList<>(group.getChildren());
         view.clearSelection();
         group.basicRemoveAllChildren();
