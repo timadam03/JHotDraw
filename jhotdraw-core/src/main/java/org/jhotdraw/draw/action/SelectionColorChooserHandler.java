@@ -56,7 +56,7 @@ public class SelectionColorChooserHandler extends AbstractSelectedAction
         fireUndoableEditHappened(createUndoableEdit(selectedColor, selectedFigures, restoreData));
     }
 
-    static Color normalizeChosenColor(Color color) {
+    public static Color normalizeChosenColor(Color color) {
         if (color != null && color.getAlpha() == 0) {
             return null;
         }
