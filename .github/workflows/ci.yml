@@ -1,0 +1,64 @@
+name: CI
+
+# Build and test on every push to the main development branches and on
+# every pull request targeting them. The workflow runs the full Maven
+# reactor build with all tests, then uploads Surefire and JGiven
+# reports as artifacts so they are inspectable from the GitHub Actions
+# run page.
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+# A new push to the same branch cancels any in-progress run on that
+# branch. Saves CI minutes when a contributor pushes a fix on top of a
+# failing build.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and test (JDK 11)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 11 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+          cache: maven
+
+      - name: Build and run all tests
+        run: mvn -B -ntp clean install
+        env:
+          # Swing classes used in tests (JColorChooser, JPopupMenu)
+          # require headless mode on the runner since no display is
+          # attached.
+          MAVEN_OPTS: -Djava.awt.headless=true
+
+      - name: Upload Surefire test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: '**/target/surefire-reports/'
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Upload JGiven BDD reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jgiven-reports
+          path: '**/target/jgiven-reports/'
+          retention-days: 14
+          if-no-files-found: ignore
