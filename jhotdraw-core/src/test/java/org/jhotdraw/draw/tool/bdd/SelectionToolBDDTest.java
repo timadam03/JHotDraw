@@ -18,6 +18,15 @@ public class SelectionToolBDDTest
         then().the_DragTracker_is_activated();
     }
 
+    // US2: As a drawing user, I want clicking an empty area to clear my current selection,
+    //      so that I can deselect figures
+    @Test
+    public void clicking_on_empty_area_clears_the_current_selection() {
+        given().an_empty_drawing_area();
+        when().the_user_presses_mouse_on_empty_area();
+        then().the_current_selection_is_cleared();
+    }
+
     // US3: As a drawing user, I want to manipulate figure handles
     @Test
     public void clicking_on_a_handle_activates_handle_tracker() {

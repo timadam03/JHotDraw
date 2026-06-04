@@ -77,6 +77,11 @@ public class ThenSelectionTool extends Stage<ThenSelectionTool> {
         return self();
     }
 
+    public ThenSelectionTool the_current_selection_is_cleared() {
+        verify(mockView).clearSelection();
+        return self();
+    }
+
     public ThenSelectionTool the_property_change_event_is_fired() {
         verify(mockListener).propertyChange(any(PropertyChangeEvent.class));
         return self();
