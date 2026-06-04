@@ -73,12 +73,32 @@
 				<version>3.2.5</version>
 				<configuration>
 					<enableAssertions>true</enableAssertions>
-					<argLine>
-						--add-opens java.base/java.lang=ALL-UNNAMED
-						--add-opens java.base/java.lang.reflect=ALL-UNNAMED
-					</argLine>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<!-- Mockito's reflection flags are only valid on the module system (JDK 9+).
+		     On the JDK 8 CI build these options crash the forked test VM, so scope them. -->
+		<profile>
+			<id>surefire-jdk9plus</id>
+			<activation>
+				<jdk>[9,)</jdk>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<argLine>
+								--add-opens java.base/java.lang=ALL-UNNAMED
+								--add-opens java.base/java.lang.reflect=ALL-UNNAMED
+							</argLine>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
