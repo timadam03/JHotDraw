@@ -35,6 +35,18 @@
 			<version>6.8.21</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- The project already ships TestNG, but the lab asks for JUnit 4 and
+		     notes that Swing and JUnit extensions work best with it. I add JUnit 4
+		     next to TestNG rather than replacing it, so the existing tests keep
+		     running and my new unit tests use JUnit 4. Surefire runs both in the
+		     same build. "test" scope means it is only on the classpath for tests
+		     and never ends up in the shipped jar. -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.2</version>
+			<scope>test</scope>
+		</dependency>
 	 <dependency>
 	  <groupId>${project.groupId}</groupId>
 	  <artifactId>jhotdraw-actions</artifactId>
