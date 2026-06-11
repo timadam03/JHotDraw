@@ -68,6 +68,7 @@ import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
 import org.jhotdraw.draw.action.AlignAction;
+import org.jhotdraw.draw.action.DistributeAction;
 import org.jhotdraw.draw.action.ApplyAttributesAction;
 import org.jhotdraw.draw.action.AttributeAction;
 import org.jhotdraw.draw.action.AttributeToggler;
@@ -1680,6 +1681,26 @@ public class ButtonFactory {
         bar.add(new BringToFrontAction(editor)).setFocusable(false);
         dsp.add(d);
         bar.add(new SendToBackAction(editor)).setFocusable(false);
+        dsp.add(d);
+    }
+
+    /**
+     * Adds the two distribute buttons to the toolbar.
+     *
+     * Concept location showed that the alignment buttons are built here, so the
+     * new distribute buttons go in the same place. This is the small secondary
+     * change the feature needs, the one spot in the existing code that has to be
+     * touched so the new action is reachable from the user interface.
+     */
+    public static void addDistributeButtonsTo(JToolBar bar, final DrawingEditor editor) {
+        addDistributeButtonsTo(bar, editor, new LinkedList<>());
+    }
+
+    public static void addDistributeButtonsTo(JToolBar bar, final DrawingEditor editor, java.util.List<Disposable> dsp) {
+        AbstractSelectedAction d;
+        bar.add(d = new DistributeAction.Horizontal(editor)).setFocusable(false);
+        dsp.add(d);
+        bar.add(d = new DistributeAction.Vertical(editor)).setFocusable(false);
         dsp.add(d);
     }
 
