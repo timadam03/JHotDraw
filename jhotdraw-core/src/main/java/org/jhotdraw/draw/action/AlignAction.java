@@ -112,6 +112,7 @@ public abstract class AlignAction extends AbstractSelectedAction {
                 f.willChange();
                 Rectangle2D.Double b = f.getBounds();
                 Point2D.Double d = alignment.delta(b, selectionBounds);
+                assert d != null : "an alignment must return a movement vector, never null";
                 AffineTransform tx = new AffineTransform();
                 tx.translate(d.x, d.y);
                 f.transform(tx);

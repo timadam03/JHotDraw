@@ -81,11 +81,13 @@ public enum Distribution {
      * @return the new leading coordinate per box, lined up with the input by index
      */
     public double[] newPositions(List<Rectangle2D.Double> boxes) {
+        assert boxes != null : "boxes must not be null";
         int n = boxes.size();
         double[] result = new double[n];
         for (int i = 0; i < n; i++) {
             result[i] = position(boxes.get(i));
         }
+        assert result.length == n : "one new leading coordinate per box";
         if (n < 3) {
             return result;
         }
@@ -122,6 +124,8 @@ public enum Distribution {
             cursor += size(boxes.get(idx)) + gap;
         }
         result[lastIdx] = end;
+        assert result[firstIdx] == start && result[lastIdx] == end
+                : "the two outermost figures keep their place";
         return result;
     }
 }
