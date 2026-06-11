@@ -47,6 +47,21 @@
 			<version>4.13.2</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- JGiven turns the user story into runnable Given-When-Then scenarios on
+		     top of JUnit, and AssertJ gives the readable assertions the Then steps
+		     use. Both are test scoped, so they never reach the shipped jar. -->
+		<dependency>
+			<groupId>com.tngtech.jgiven</groupId>
+			<artifactId>jgiven-junit</artifactId>
+			<version>1.3.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.24.2</version>
+			<scope>test</scope>
+		</dependency>
 	 <dependency>
 	  <groupId>${project.groupId}</groupId>
 	  <artifactId>jhotdraw-actions</artifactId>
