@@ -30,33 +30,14 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>jhotdraw-actions</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 			<version>7.8.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.13.2</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>4.11.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.tngtech.jgiven</groupId>
-			<artifactId>jgiven-testng</artifactId>
-			<version>1.3.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-			<version>3.24.2</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- The project already ships TestNG, but the lab asks for JUnit 4 and
@@ -79,9 +60,17 @@
 			<version>4.11.0</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- JGiven turns the user story into runnable Given-When-Then scenarios on
-		     top of JUnit, and AssertJ gives the readable assertions the Then steps
-		     use. Both are test scoped, so they never reach the shipped jar. -->
+		<!-- JGiven turns the user story into runnable Given-When-Then scenarios,
+		     and AssertJ gives the readable assertions the Then steps use. Both are
+		     test scoped, so they never reach the shipped jar. The group/ungroup
+		     scenarios use the TestNG integration; another feature's scenarios use
+		     the JUnit integration, so both JGiven flavours are on the test path. -->
+		<dependency>
+			<groupId>com.tngtech.jgiven</groupId>
+			<artifactId>jgiven-testng</artifactId>
+			<version>1.3.1</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>com.tngtech.jgiven</groupId>
 			<artifactId>jgiven-junit</artifactId>
@@ -94,11 +83,6 @@
 			<version>3.24.2</version>
 			<scope>test</scope>
 		</dependency>
-	 <dependency>
-	  <groupId>${project.groupId}</groupId>
-	  <artifactId>jhotdraw-actions</artifactId>
-	  <version>${project.version}</version>
-	 </dependency>
 	</dependencies>
 	<build>
 		<plugins>
