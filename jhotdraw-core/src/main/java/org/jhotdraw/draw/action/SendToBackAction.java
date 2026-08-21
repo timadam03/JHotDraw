@@ -39,11 +39,6 @@ public class SendToBackAction extends ZOrderAction {
         sendToBack(view, figures);
     }
 
-    @Override
-    protected void undoMoveFigures(DrawingView view, Collection<Figure> figures) {
-        BringToFrontAction.bringToFront(view, figures);
-    }
-
     public static void sendToBack(DrawingView view, Collection<Figure> figures) {
         Drawing drawing = view.getDrawing();
         for (Figure figure : figures) { // XXX Shouldn't the figures be sorted here back to front?

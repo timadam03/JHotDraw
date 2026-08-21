@@ -39,11 +39,6 @@ public class BringToFrontAction extends ZOrderAction {
         bringToFront(view, figures);
     }
 
-    @Override
-    protected void undoMoveFigures(DrawingView view, Collection<Figure> figures) {
-        SendToBackAction.sendToBack(view, figures);
-    }
-
     public static void bringToFront(DrawingView view, Collection<Figure> figures) {
         Drawing drawing = view.getDrawing();
         for (Figure figure : drawing.sort(figures)) {

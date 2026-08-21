@@ -32,7 +32,12 @@ abstract class ZOrderAction extends AbstractSelectedAction {
     @Override
     public void actionPerformed(java.awt.event.ActionEvent e) {
         final DrawingView view = getView();
+        final Drawing drawing = view.getDrawing();
         final LinkedList<Figure> figures = new LinkedList<>(view.getSelectedFigures());
+        final HashMap<Figure, Integer> oldIndices = new HashMap<>();
+        for (Figure figure : figures) {
+            oldIndices.put(figure, drawing.indexOf(figure));
+        }
         moveFigures(view, figures);
         fireUndoableEditHappened(new AbstractUndoableEdit() {
             private static final long serialVersionUID = 1L;
@@ -53,12 +58,22 @@ abstract class ZOrderAction extends AbstractSelectedAction {
             @Override
             public void undo() throws CannotUndoException {
                 super.undo();
-                undoMoveFigures(view, figures);
+                restoreOldOrder(drawing, oldIndices);
             }
         });
     }
 
-    protected abstract void moveFigures(DrawingView view, Collection<Figure> figures);
+    // Remove all, then add back low-index first so target indices stay in range.
+    private static void restoreOldOrder(Drawing drawing, Map<Figure, Integer> oldIndices) {
+        ArrayList<Figure> ordered = new ArrayList<>(oldIndices.keySet());
+        ordered.sort(Comparator.comparingInt(oldIndices::get));
+        for (Figure figure : ordered) {
+            drawing.basicRemove(figure);
+        }
+        for (Figure figure : ordered) {
+            drawing.basicAdd(oldIndices.get(figure), figure);
+        }
+    }
 
-    protected abstract void undoMoveFigures(DrawingView view, Collection<Figure> figures);
+    protected abstract void moveFigures(DrawingView view, Collection<Figure> figures);
 }
