@@ -11,6 +11,7 @@ import org.jhotdraw.draw.figure.Figure;
 import java.util.*;
 import org.jhotdraw.draw.*;
 import org.jhotdraw.util.ResourceBundleUtil;
+import org.jhotdraw.util.ReversedList;
 
 /**
  * SendToBackAction.
@@ -41,7 +42,8 @@ public class SendToBackAction extends ZOrderAction {
 
     public static void sendToBack(DrawingView view, Collection<Figure> figures) {
         Drawing drawing = view.getDrawing();
-        for (Figure figure : figures) { // XXX Shouldn't the figures be sorted here back to front?
+        // sort is back-to-front; reverse so the back-most selected stays behind the others
+        for (Figure figure : new ReversedList<>(drawing.sort(figures))) {
             drawing.sendToBack(figure);
         }
     }
