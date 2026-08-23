@@ -4,7 +4,6 @@
 package org.jhotdraw.draw.action.bdd;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.tngtech.jgiven.Stage;
 import com.tngtech.jgiven.annotation.ProvidedScenarioState;
@@ -29,13 +28,9 @@ public class GivenStacking extends Stage<GivenStacking> {
     DrawingView view;
     @ProvidedScenarioState
     DrawingEditor editor;
-    @ProvidedScenarioState
     Figure a;
-    @ProvidedScenarioState
     Figure b;
-    @ProvidedScenarioState
     Figure c;
-    @ProvidedScenarioState
     Figure d;
     @ProvidedScenarioState
     List<Figure> originalOrder;
@@ -60,9 +55,9 @@ public class GivenStacking extends Stage<GivenStacking> {
         undoManager = new UndoManager();
         drawing.addUndoableEditListener(undoManager);
 
-        when(editor.getActiveView()).thenReturn(view);
-        when(view.getDrawing()).thenReturn(drawing);
-        when(view.isEnabled()).thenReturn(true);
+        org.mockito.Mockito.when(editor.getActiveView()).thenReturn(view);
+        org.mockito.Mockito.when(view.getDrawing()).thenReturn(drawing);
+        org.mockito.Mockito.when(view.isEnabled()).thenReturn(true);
         select();
         return self();
     }
@@ -80,7 +75,7 @@ public class GivenStacking extends Stage<GivenStacking> {
     private void select(Figure... figures) {
         Set<Figure> selected = new LinkedHashSet<>();
         Collections.addAll(selected, figures);
-        when(view.getSelectedFigures()).thenReturn(selected);
-        when(view.getSelectionCount()).thenReturn(selected.size());
+        org.mockito.Mockito.when(view.getSelectedFigures()).thenReturn(selected);
+        org.mockito.Mockito.when(view.getSelectionCount()).thenReturn(selected.size());
     }
 }
